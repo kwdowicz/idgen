@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -10,10 +11,12 @@ import (
 )
 
 func main() {
-	// First, try to find log file name as an argument
+	// First, try to find log and port file name as an argument
 	var logFile string
-	flag.StringVar(&logFile, "log", "", "Path to the log file (shorthand: -l)")
+	var port string 
 	flag.StringVar(&logFile, "l", "", "Path to the log file")
+	flag.StringVar(&port, "p", "", "Port")
+
 	flag.Parse()
 
 	// if not provided check env variable
@@ -21,9 +24,17 @@ func main() {
 		logFile = os.Getenv("IDGEN_LOG")
 	}
 
+	if port == "" {
+		port = os.Getenv("IDGEN_PORT")
+	}
+
 	// if still empty then use default
 	if logFile == "" {
 		logFile = "generated.log"
+	}
+
+	if port == "" {
+		port = "7777"
 	}
 
 	app := &application{
@@ -31,6 +42,6 @@ func main() {
 	}
 	r := chi.NewRouter()
 	r.Mount("/v1", v1Router(*app))
-	fmt.Println("Server is listening on port 8080...")
-	http.ListenAndServe(":8080", r)
+	log.Printf("Server is listening on port %s...\n", port)
+	http.ListenAndServe(fmt.Sprintf(":%s", port), r)
 }

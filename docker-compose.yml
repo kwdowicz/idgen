@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "7777:7777" # Map container port 7777 to host port 7777
+    environment:
+      IDGEN_LOG: "/app/logs/generated.log" # Log file location in the container
+      IDGEN_PORT: "7777"                  # Application port
+    volumes:
+      - ./logs:/app/logs                  # Map logs directory on host to container
+    restart: always
